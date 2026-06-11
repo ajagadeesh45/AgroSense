@@ -1,7 +1,8 @@
-numpy>=1.26
-scikit-learn==1.6.1
-pandas>=2.0
-pillow>=10.0
-flask==3.0.3
-flask-cors==4.0.1
-tensorflow>=2.13pip uninstall numpy -y
+flask
+gunicorn
+numpy
+pandas
+scikit-learn
+tensorflow==2.13.0
+opencv-python-headless
+pillow
