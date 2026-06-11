@@ -1,0 +1,7 @@
+numpy>=1.26
+scikit-learn==1.6.1
+pandas>=2.0
+pillow>=10.0
+flask==3.0.3
+flask-cors==4.0.1
+tensorflow>=2.13pip uninstall numpy -y

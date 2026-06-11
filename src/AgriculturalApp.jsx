@@ -379,7 +379,7 @@ function useRotatingQuote(lang) {
 }
 
 /* ═══════════════════════════════════════
-   LOGIN PAGE — Split layout
+   LOGIN PAGE — Split layout with farm image
 ═══════════════════════════════════════ */
 function LoginPage({onLogin,lang,setLang}){
   const [form,setF]    = useState({username:"",password:"",dob:""});
@@ -389,17 +389,16 @@ function LoginPage({onLogin,lang,setLang}){
   const { text: quoteText, author: quoteAuthor, idx: quoteIdx } = useRotatingQuote(lang);
   const [quoteVisible, setQV] = useState(true);
 
-  // fade quote on change
   useEffect(() => {
     setQV(false);
-    const t = setTimeout(() => setQV(true), 120);
-    return () => clearTimeout(t);
+    const tm = setTimeout(() => setQV(true), 150);
+    return () => clearTimeout(tm);
   }, [quoteIdx]);
 
   const set=k=>e=>setF(f=>({...f,[k]:e.target.value}));
 
   const submit=e=>{
-    e.preventDefault();setErr("");
+    e.preventDefault(); setErr("");
     if(!form.username.trim())  return setErr(t("errUsername",lang));
     if(form.password.length<4) return setErr(t("errPassword",lang));
     if(!form.dob)              return setErr(t("errDob",lang));
@@ -407,7 +406,7 @@ function LoginPage({onLogin,lang,setLang}){
     setTimeout(()=>{
       const u={username:form.username.trim(),dob:form.dob,loggedIn:true};
       localStorage.setItem(STORE_KEY,JSON.stringify(u));
-      setBusy(false);onLogin(u);
+      setBusy(false); onLogin(u);
     },700);
   };
 
@@ -416,77 +415,91 @@ function LoginPage({onLogin,lang,setLang}){
       minHeight:"100vh",
       display:"flex",
       flexDirection:"column",
-      position:"relative",zIndex:10
+      position:"relative",
+      zIndex:10,
+      overflow:"hidden"
     }}>
-      {/* Lang picker top right */}
-      <div style={{position:"absolute",top:18,right:18,zIndex:20}}>
-        <LangPicker lang={lang} setLang={setLang} dark={false}/>
+      {/* ── FULL background image ── */}
+      <div style={{
+        position:"fixed", inset:0, zIndex:0,
+        backgroundImage:"url('/farmimg.jpg')",
+        backgroundSize:"cover",
+        backgroundPosition:"center top",
+        backgroundRepeat:"no-repeat",
+      }}/>
+      {/* Dark overlay — makes text readable */}
+      <div style={{
+        position:"fixed", inset:0, zIndex:1,
+        background:"linear-gradient(160deg,rgba(3,20,3,.82) 0%,rgba(5,46,22,.75) 40%,rgba(3,20,3,.88) 100%)"
+      }}/>
+
+      {/* Lang picker */}
+      <div style={{position:"absolute",top:18,right:18,zIndex:30}}>
+        <LangPicker lang={lang} setLang={setLang} dark={true}/>
       </div>
 
-      {/* ── LEFT panel (top on mobile) ── */}
+      {/* ── TOP section — Logo + Quote ── */}
       <div style={{
+        position:"relative", zIndex:10,
         flex:"0 0 auto",
-        background:GR.primary,
-        padding:"48px 32px 40px",
-        display:"flex",flexDirection:"column",
-        alignItems:"center",justifyContent:"center",
-        minHeight:280,
-        position:"relative",overflow:"hidden"
+        padding:"52px 28px 32px",
+        display:"flex", flexDirection:"column",
+        alignItems:"center",
       }}>
-        {/* Subtle dot pattern */}
-        <div style={{position:"absolute",inset:0,
-          backgroundImage:"radial-gradient(circle,rgba(255,255,255,.07) 1px,transparent 1px)",
-          backgroundSize:"24px 24px",pointerEvents:"none"}}/>
-
         {/* Logo */}
-        <div className="fadeUp" style={{marginBottom:20,position:"relative",zIndex:1}}>
-          <AgroSenseLogo size={56} showText={true} light={true}/>
+        <div className="fadeUp" style={{marginBottom:14}}>
+          <AgroSenseLogo size={52} showText={true} light={true}/>
         </div>
 
         {/* Tagline */}
         <p className="fadeUp" style={{
-          color:"rgba(255,255,255,.75)",fontSize:13,
-          textAlign:"center",maxWidth:280,lineHeight:1.6,
-          fontStyle:"italic",marginBottom:28,
-          position:"relative",zIndex:1,
-          animationDelay:".1s"
+          color:"rgba(255,255,255,.80)",
+          fontSize:13, textAlign:"center",
+          fontStyle:"italic", marginBottom:22,
+          letterSpacing:".04em",
+          animationDelay:".1s",
+          textShadow:"0 1px 6px rgba(0,0,0,.8)"
         }}>
           {BRAND.tagline}
         </p>
 
-        {/* Quote card */}
+        {/* Quote card — glass effect over image */}
         <div className="fadeUp" style={{
-          background:"rgba(255,255,255,.1)",
-          backdropFilter:"blur(8px)",
-          border:"1px solid rgba(255,255,255,.2)",
-          borderRadius:RA.lg,padding:"18px 20px",
-          maxWidth:320,width:"100%",
-          position:"relative",zIndex:1,
-          animationDelay:".2s"
+          background:"rgba(0,0,0,.55)",
+          backdropFilter:"blur(12px)",
+          WebkitBackdropFilter:"blur(12px)",
+          border:"1px solid rgba(255,255,255,.18)",
+          borderRadius:RA.lg,
+          padding:"16px 18px",
+          maxWidth:340, width:"100%",
+          animationDelay:".15s"
         }}>
-          {/* Quote icon */}
-          <div style={{fontSize:28,lineHeight:1,color:"rgba(255,255,255,.4)",
-            fontFamily:"Georgia,serif",marginBottom:8,
+          <div style={{fontSize:26,color:"rgba(255,255,255,.35)",
+            fontFamily:"Georgia,serif",lineHeight:1,marginBottom:6,
             userSelect:"none"}}>"</div>
           <p style={{
-            color:"rgba(255,255,255,.92)",fontSize:13,lineHeight:1.7,
-            margin:"0 0 10px",fontStyle:"italic",
+            color:"#fff",
+            fontSize:13, lineHeight:1.75,
+            margin:"0 0 10px",
+            fontStyle:"italic",
             opacity:quoteVisible?1:0,
-            transition:"opacity .3s ease"
+            transition:"opacity .35s ease",
+            textShadow:"0 1px 4px rgba(0,0,0,.6)"
           }}>
             {quoteText}
           </p>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <p style={{color:"rgba(255,255,255,.6)",fontSize:12,
-              margin:0,fontWeight:600}}>
-              — {quoteAuthor}
-            </p>
-            {/* Quote dot indicators */}
-            <div style={{display:"flex",gap:4}}>
+            <p style={{
+              color:"rgba(255,255,255,.65)",
+              fontSize:12, margin:0, fontWeight:600,
+              textShadow:"0 1px 3px rgba(0,0,0,.5)"
+            }}>— {quoteAuthor}</p>
+            <div style={{display:"flex",gap:5}}>
               {QUOTES.map((_,i)=>(
                 <div key={i} style={{
-                  width:i===quoteIdx?16:6,height:6,borderRadius:3,
-                  background:i===quoteIdx?"rgba(255,255,255,.9)":"rgba(255,255,255,.3)",
+                  width:i===quoteIdx?18:6, height:6,
+                  borderRadius:3,
+                  background:i===quoteIdx?"rgba(255,255,255,.95)":"rgba(255,255,255,.28)",
                   transition:"all .4s ease"
                 }}/>
               ))}
@@ -496,36 +509,49 @@ function LoginPage({onLogin,lang,setLang}){
 
         {/* Feature pills */}
         <div className="fadeUp" style={{
-          display:"flex",flexWrap:"wrap",gap:8,
-          justifyContent:"center",marginTop:22,
-          position:"relative",zIndex:1,
-          animationDelay:".3s"
+          display:"flex", flexWrap:"wrap", gap:8,
+          justifyContent:"center", marginTop:18,
+          animationDelay:".2s"
         }}>
           {["🔬 Disease AI","🌱 Crop AI","🌦️ Weather","💹 Price AI"].map(pill=>(
             <span key={pill} style={{
-              background:"rgba(255,255,255,.12)",
-              border:"1px solid rgba(255,255,255,.2)",
-              borderRadius:RA.full,padding:"4px 12px",
-              fontSize:11,color:"rgba(255,255,255,.85)",fontWeight:600
+              background:"rgba(20,184,166,.25)",
+              border:"1px solid rgba(20,184,166,.5)",
+              borderRadius:RA.full, padding:"4px 13px",
+              fontSize:11, color:"rgba(255,255,255,.9)",
+              fontWeight:600,
+              backdropFilter:"blur(6px)",
+              textShadow:"0 1px 3px rgba(0,0,0,.5)"
             }}>{pill}</span>
           ))}
         </div>
       </div>
 
-      {/* ── RIGHT panel (bottom on mobile) — Sign in form ── */}
+      {/* ── BOTTOM section — Sign in form ── */}
       <div style={{
+        position:"relative", zIndex:10,
         flex:1,
-        background:"#fff",
-        padding:"36px 28px 32px",
-        display:"flex",flexDirection:"column",
-        justifyContent:"center"
+        background:"rgba(255,255,255,.97)",
+        borderRadius:"28px 28px 0 0",
+        padding:"32px 26px 36px",
+        boxShadow:"0 -8px 40px rgba(0,0,0,.35)",
+        /* teal top accent line */
+        borderTop:"4px solid transparent",
+        backgroundClip:"padding-box"
       }}>
+        {/* Teal accent bar */}
+        <div style={{
+          position:"absolute", top:-4, left:0, right:0, height:4,
+          borderRadius:"28px 28px 0 0",
+          background:"linear-gradient(90deg,#052e16,#14b8a6,#16a34a,#14b8a6,#052e16)"
+        }}/>
+
         <h2 style={{
-          fontFamily:FN.heading,fontSize:26,color:CL.primary[900],
-          marginBottom:4
+          fontFamily:FN.heading, fontSize:24,
+          color:CL.primary[900], marginBottom:4
         }}>Welcome back 👋</h2>
-        <p style={{color:G[500],fontSize:13,marginBottom:24,lineHeight:1.5}}>
-          Sign in to access your smart farm dashboard
+        <p style={{color:G[500],fontSize:13,marginBottom:22,lineHeight:1.5}}>
+          Sign in to your AgroSense dashboard
         </p>
 
         <form onSubmit={submit}>
@@ -553,7 +579,7 @@ function LoginPage({onLogin,lang,setLang}){
           </div>
 
           {/* Password */}
-          <div style={{marginBottom:20,position:"relative"}}>
+          <div style={{marginBottom:20}}>
             <FL>{t("password",lang)}</FL>
             <div style={{position:"relative"}}>
               <TInp type={showPw?"text":"password"}
@@ -571,8 +597,8 @@ function LoginPage({onLogin,lang,setLang}){
                   </span>
                 )}
                 <button type="button" onClick={()=>setSP(p=>!p)} style={{
-                  background:"none",border:"none",cursor:"pointer",
-                  color:G[400],padding:4}}>
+                  background:"none",border:"none",
+                  cursor:"pointer",color:G[400],padding:4}}>
                   {showPw?<EyeOff size={17}/>:<Eye size={17}/>}
                 </button>
               </div>
@@ -580,15 +606,14 @@ function LoginPage({onLogin,lang,setLang}){
           </div>
 
           {err&&(
-            <div style={{background:"#fef2f2",border:"1px solid #fca5a5",
-              borderRadius:RA.md,padding:"10px 13px",color:"#b91c1c",
-              fontSize:13,marginBottom:14,fontWeight:500}}>
-              ⚠️ {err}
-            </div>
+            <div style={{
+              background:"#fef2f2",border:"1px solid #fca5a5",
+              borderRadius:RA.md,padding:"10px 13px",
+              color:"#b91c1c",fontSize:13,marginBottom:14,fontWeight:500
+            }}>⚠️ {err}</div>
           )}
 
-          <PBtn disabled={busy} shimmer={!busy}
-            style={{borderRadius:RA.lg}}>
+          <PBtn disabled={busy} shimmer={!busy} style={{borderRadius:RA.lg}}>
             {busy?t("signingIn",lang):t("signIn",lang)+" →"}
           </PBtn>
         </form>
@@ -655,14 +680,10 @@ function HomeScreen({user,onLogout,setActive,lang,setLang}){
     ?Math.floor((Date.now()-new Date(user.dob))/(365.25*24*3600*1000)):"—";
 
   const cards=[
-    {id:"disease",grad:GR.disease,emoji:"🔬",titleK:"diseaseTitle",subK:"homeDiseaseSub",
-     badge:"AI Powered"},
-    {id:"crop",   grad:GR.crop,   emoji:"🌱",titleK:"cropTitle",   subK:"homeCropSub",
-     badge:"ML Model"},
-    {id:"weather",grad:GR.weather,emoji:"🌦️",titleK:"weatherTitle",subK:"homeWeatherSub",
-     badge:"Live GPS"},
-    {id:"price",  grad:GR.price,  emoji:"💹",titleK:"priceTitle",  subK:"homePriceSub",
-     badge:"AI Model"},
+    {id:"disease",grad:GR.disease,emoji:"🔬",titleK:"diseaseTitle",subK:"homeDiseaseSub"},
+    {id:"crop",   grad:GR.crop,   emoji:"🌱",titleK:"cropTitle",   subK:"homeCropSub"},
+    {id:"weather",grad:GR.weather,emoji:"🌦️",titleK:"weatherTitle",subK:"homeWeatherSub"},
+    {id:"price",  grad:GR.price,  emoji:"💹",titleK:"priceTitle",  subK:"homePriceSub"},
   ];
 
   return(
@@ -736,12 +757,7 @@ function HomeScreen({user,onLogout,setActive,lang,setLang}){
                   textShadow:"0 1px 4px rgba(0,0,0,.3)"}}>
                   {t(c.titleK,lang)}
                 </span>
-                <span style={{background:"rgba(255,255,255,.18)",
-                  borderRadius:RA.full,padding:"2px 8px",
-                  fontSize:10,color:"#fff",fontWeight:600,
-                  letterSpacing:".04em"}}>
-                  {c.badge}
-                </span>
+
               </div>
               <div style={{fontSize:12,color:"rgba(255,255,255,.75)",
                 lineHeight:1.4}}>
@@ -751,15 +767,7 @@ function HomeScreen({user,onLogout,setActive,lang,setLang}){
           </button>
         ))}
 
-        {/* Backend note */}
-        <div style={{
-          background:CL.teal[50],
-          border:"1px solid "+CL.teal[200],
-          borderRadius:RA.md,padding:"12px 14px",marginTop:4}}>
-          <p style={{margin:0,fontSize:12,color:CL.teal[800],lineHeight:1.7}}>
-            🟢 {t("backendNote",lang)}
-          </p>
-        </div>
+
       </div>
     </ScreenWrap>
   );
