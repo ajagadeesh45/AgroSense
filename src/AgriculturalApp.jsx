@@ -12,7 +12,7 @@ import { BRAND, COLORS as CL, GRADIENTS as GR, SHADOWS as SH, RADIUS as RA, FONT
 /* ═══════════════════════════════════════
    CONFIG
 ═══════════════════════════════════════ */
-const API = "http://127.0.0.1:5000/api";
+const API         = "http://localhost:5000/api";
 // ⚠️  Get your FREE key at https://openweathermap.org/api → paste below
 const WEATHER_KEY = "51c5817851b7e9f6d44689629ab9f785"; // replace if expired
 const STORE_KEY   = "agrosense_v1";
@@ -379,21 +379,21 @@ function useRotatingQuote(lang) {
 }
 
 /* ═══════════════════════════════════════
-   LOGIN PAGE — Unified full-screen with farm image
+   LOGIN PAGE — Split layout with farm image
 ═══════════════════════════════════════ */
 function LoginPage({onLogin,lang,setLang}){
   const [form,setF]    = useState({username:"",password:"",dob:""});
   const [showPw,setSP] = useState(false);
   const [err,setErr]   = useState("");
   const [busy,setBusy] = useState(false);
-  const { text:quoteText, author:quoteAuthor, idx:quoteIdx } = useRotatingQuote(lang);
-  const [qv, setQv]    = useState(true);
+  const { text: quoteText, author: quoteAuthor, idx: quoteIdx } = useRotatingQuote(lang);
+  const [quoteVisible, setQV] = useState(true);
 
-  useEffect(()=>{
-    setQv(false);
-    const tm=setTimeout(()=>setQv(true),150);
-    return ()=>clearTimeout(tm);
-  },[quoteIdx]);
+  useEffect(() => {
+    setQV(false);
+    const tm = setTimeout(() => setQV(true), 150);
+    return () => clearTimeout(tm);
+  }, [quoteIdx]);
 
   const set=k=>e=>setF(f=>({...f,[k]:e.target.value}));
 
@@ -413,88 +413,93 @@ function LoginPage({onLogin,lang,setLang}){
   return(
     <div style={{
       minHeight:"100vh",
-      position:"relative",
       display:"flex",
       flexDirection:"column",
-      justifyContent:"flex-end",
+      position:"relative",
+      zIndex:10,
       overflow:"hidden"
     }}>
-      {/* ── Full-screen farm image ── */}
+      {/* ── FULL background image ── */}
       <div style={{
-        position:"absolute", inset:0, zIndex:0,
+        position:"fixed", inset:0, zIndex:0,
         backgroundImage:"url('/farmimg.jpg')",
         backgroundSize:"cover",
-        backgroundPosition:"center center",
+        backgroundPosition:"center top",
+        backgroundRepeat:"no-repeat",
       }}/>
-
-      {/* ── Gradient overlay — dark top, lighter bottom ── */}
+      {/* Dark overlay — makes text readable */}
       <div style={{
-        position:"absolute", inset:0, zIndex:1,
-        background:"linear-gradient(180deg,rgba(3,15,3,.65) 0%,rgba(5,40,20,.7) 38%,rgba(3,10,3,.88) 70%,rgba(2,8,2,.97) 100%)"
+        position:"fixed", inset:0, zIndex:1,
+        background:"linear-gradient(160deg,rgba(3,20,3,.82) 0%,rgba(5,46,22,.75) 40%,rgba(3,20,3,.88) 100%)"
       }}/>
 
-      {/* ── Lang picker ── */}
+      {/* Lang picker */}
       <div style={{position:"absolute",top:18,right:18,zIndex:30}}>
         <LangPicker lang={lang} setLang={setLang} dark={true}/>
       </div>
 
-      {/* ── All content stacked naturally over image ── */}
+      {/* ── TOP section — Logo + Quote ── */}
       <div style={{
         position:"relative", zIndex:10,
-        width:"100%",
-        padding:"0 22px 36px",
-        display:"flex",
-        flexDirection:"column",
+        flex:"0 0 auto",
+        padding:"52px 28px 32px",
+        display:"flex", flexDirection:"column",
+        alignItems:"center",
       }}>
-
-        {/* Logo + tagline — top area */}
-        <div style={{
-          paddingTop:52,
-          paddingBottom:20,
-          textAlign:"center"
-        }}>
-          <div className="fadeUp">
-            <AgroSenseLogo size={48} showText={true} light={true}/>
-          </div>
-          <p className="fadeUp" style={{
-            color:"rgba(255,255,255,.72)",
-            fontSize:12, marginTop:8,
-            fontStyle:"italic",
-            letterSpacing:".05em",
-            textShadow:"0 1px 6px rgba(0,0,0,.9)",
-            animationDelay:".1s"
-          }}>{BRAND.tagline}</p>
+        {/* Logo */}
+        <div className="fadeUp" style={{marginBottom:14}}>
+          <AgroSenseLogo size={52} showText={true} light={true}/>
         </div>
 
-        {/* Quote */}
+        {/* Tagline */}
+        <p className="fadeUp" style={{
+          color:"rgba(255,255,255,.80)",
+          fontSize:13, textAlign:"center",
+          fontStyle:"italic", marginBottom:22,
+          letterSpacing:".04em",
+          animationDelay:".1s",
+          textShadow:"0 1px 6px rgba(0,0,0,.8)"
+        }}>
+          {BRAND.tagline}
+        </p>
+
+        {/* Quote card — glass effect over image */}
         <div className="fadeUp" style={{
-          background:"rgba(0,0,0,.45)",
-          backdropFilter:"blur(14px)",
-          WebkitBackdropFilter:"blur(14px)",
-          border:"1px solid rgba(255,255,255,.13)",
+          background:"rgba(0,0,0,.55)",
+          backdropFilter:"blur(12px)",
+          WebkitBackdropFilter:"blur(12px)",
+          border:"1px solid rgba(255,255,255,.18)",
           borderRadius:RA.lg,
-          padding:"14px 16px",
-          marginBottom:16,
+          padding:"16px 18px",
+          maxWidth:340, width:"100%",
           animationDelay:".15s"
         }}>
-          <span style={{fontSize:22,color:"rgba(255,255,255,.3)",
-            fontFamily:"Georgia,serif",lineHeight:1,display:"block",
-            marginBottom:4,userSelect:"none"}}>"</span>
+          <div style={{fontSize:26,color:"rgba(255,255,255,.35)",
+            fontFamily:"Georgia,serif",lineHeight:1,marginBottom:6,
+            userSelect:"none"}}>"</div>
           <p style={{
-            color:"#fff", fontSize:12, lineHeight:1.7,
-            margin:"0 0 8px", fontStyle:"italic",
-            opacity:qv?1:0, transition:"opacity .3s ease",
-            textShadow:"0 1px 4px rgba(0,0,0,.7)"
-          }}>{quoteText}</p>
+            color:"#fff",
+            fontSize:13, lineHeight:1.75,
+            margin:"0 0 10px",
+            fontStyle:"italic",
+            opacity:quoteVisible?1:0,
+            transition:"opacity .35s ease",
+            textShadow:"0 1px 4px rgba(0,0,0,.6)"
+          }}>
+            {quoteText}
+          </p>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <span style={{color:"rgba(255,255,255,.55)",fontSize:11,fontWeight:600}}>
-              — {quoteAuthor}
-            </span>
-            <div style={{display:"flex",gap:4}}>
+            <p style={{
+              color:"rgba(255,255,255,.65)",
+              fontSize:12, margin:0, fontWeight:600,
+              textShadow:"0 1px 3px rgba(0,0,0,.5)"
+            }}>— {quoteAuthor}</p>
+            <div style={{display:"flex",gap:5}}>
               {QUOTES.map((_,i)=>(
                 <div key={i} style={{
-                  width:i===quoteIdx?16:5, height:5, borderRadius:3,
-                  background:i===quoteIdx?"rgba(255,255,255,.9)":"rgba(255,255,255,.25)",
+                  width:i===quoteIdx?18:6, height:6,
+                  borderRadius:3,
+                  background:i===quoteIdx?"rgba(255,255,255,.95)":"rgba(255,255,255,.28)",
                   transition:"all .4s ease"
                 }}/>
               ))}
@@ -502,120 +507,120 @@ function LoginPage({onLogin,lang,setLang}){
           </div>
         </div>
 
-        {/* Sign-in form card */}
+        {/* Feature pills */}
         <div className="fadeUp" style={{
-          background:"rgba(255,255,255,.97)",
-          borderRadius:RA.xl,
-          padding:"24px 20px 22px",
-          boxShadow:"0 8px 40px rgba(0,0,0,.45)",
-          border:"1px solid rgba(255,255,255,.3)",
-          animationDelay:".2s",
-          position:"relative",
-          overflow:"hidden"
-        }}>
-          {/* Teal top accent */}
-          <div style={{
-            position:"absolute", top:0, left:0, right:0, height:3,
-            background:"linear-gradient(90deg,#052e16,#14b8a6,#16a34a,#14b8a6,#052e16)"
-          }}/>
-
-          {/* Header */}
-          <div style={{marginBottom:18,paddingTop:4}}>
-            <h2 style={{
-              fontFamily:FN.heading, fontSize:22,
-              color:CL.primary[900], marginBottom:3
-            }}>Welcome back 👋</h2>
-            <p style={{color:G[400],fontSize:12,lineHeight:1.4}}>
-              Sign in to your AgroSense dashboard
-            </p>
-          </div>
-
-          <form onSubmit={submit}>
-            {/* Username */}
-            <div style={{marginBottom:12}}>
-              <FL>{t("username",lang)}</FL>
-              <div style={{position:"relative"}}>
-                <TInp type="text" placeholder={t("username",lang)}
-                  value={form.username} onChange={set("username")}
-                  autoComplete="username"/>
-                {form.username.length>0&&(
-                  <span style={{position:"absolute",right:11,top:"50%",
-                    transform:"translateY(-50%)",fontSize:14}}>
-                    {form.username.length>2?"✅":"✍️"}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* DOB */}
-            <div style={{marginBottom:12}}>
-              <FL>{t("dob",lang)}</FL>
-              <TInp type="date" value={form.dob} onChange={set("dob")}
-                max={new Date().toISOString().split("T")[0]}/>
-            </div>
-
-            {/* Password */}
-            <div style={{marginBottom:18}}>
-              <FL>{t("password",lang)}</FL>
-              <div style={{position:"relative"}}>
-                <TInp type={showPw?"text":"password"}
-                  placeholder="••••••••"
-                  style={{paddingRight:82,letterSpacing:showPw?"normal":".18em"}}
-                  value={form.password} onChange={set("password")}
-                  autoComplete="current-password"/>
-                <div style={{position:"absolute",right:8,top:"50%",
-                  transform:"translateY(-50%)",
-                  display:"flex",alignItems:"center",gap:3}}>
-                  {form.password.length>0&&(
-                    <span style={{fontSize:13}}>
-                      {form.password.length>=4?"✅":"⚠️"}
-                    </span>
-                  )}
-                  <button type="button" onClick={()=>setSP(p=>!p)} style={{
-                    background:"none",border:"none",
-                    cursor:"pointer",color:G[400],padding:4}}>
-                    {showPw?<EyeOff size={16}/>:<Eye size={16}/>}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {err&&(
-              <div style={{
-                background:"#fef2f2",border:"1px solid #fca5a5",
-                borderRadius:RA.md,padding:"9px 12px",
-                color:"#b91c1c",fontSize:12,marginBottom:12,fontWeight:500
-              }}>⚠️ {err}</div>
-            )}
-
-            <PBtn disabled={busy} shimmer={!busy} style={{borderRadius:RA.lg}}>
-              {busy?t("signingIn",lang):t("signIn",lang)+" →"}
-            </PBtn>
-          </form>
-
-          <p style={{textAlign:"center",fontSize:11,color:G[400],marginTop:12}}>
-            {t("storedDevice",lang)}
-          </p>
-        </div>
-
-        {/* Feature pills at bottom */}
-        <div className="fadeUp" style={{
-          display:"flex",flexWrap:"wrap",gap:6,
-          justifyContent:"center",marginTop:16,
-          animationDelay:".25s"
+          display:"flex", flexWrap:"wrap", gap:8,
+          justifyContent:"center", marginTop:18,
+          animationDelay:".2s"
         }}>
           {["🔬 Disease AI","🌱 Crop AI","🌦️ Weather","💹 Price AI"].map(pill=>(
             <span key={pill} style={{
-              background:"rgba(20,184,166,.2)",
-              border:"1px solid rgba(20,184,166,.4)",
-              borderRadius:RA.full,padding:"3px 11px",
-              fontSize:11,color:"rgba(255,255,255,.85)",fontWeight:600,
+              background:"rgba(20,184,166,.25)",
+              border:"1px solid rgba(20,184,166,.5)",
+              borderRadius:RA.full, padding:"4px 13px",
+              fontSize:11, color:"rgba(255,255,255,.9)",
+              fontWeight:600,
               backdropFilter:"blur(6px)",
               textShadow:"0 1px 3px rgba(0,0,0,.5)"
             }}>{pill}</span>
           ))}
         </div>
+      </div>
 
+      {/* ── BOTTOM section — Sign in form ── */}
+      <div style={{
+        position:"relative", zIndex:10,
+        flex:1,
+        background:"rgba(255,255,255,.97)",
+        borderRadius:"28px 28px 0 0",
+        padding:"32px 26px 36px",
+        boxShadow:"0 -8px 40px rgba(0,0,0,.35)",
+        /* teal top accent line */
+        borderTop:"4px solid transparent",
+        backgroundClip:"padding-box"
+      }}>
+        {/* Teal accent bar */}
+        <div style={{
+          position:"absolute", top:-4, left:0, right:0, height:4,
+          borderRadius:"28px 28px 0 0",
+          background:"linear-gradient(90deg,#052e16,#14b8a6,#16a34a,#14b8a6,#052e16)"
+        }}/>
+
+        <h2 style={{
+          fontFamily:FN.heading, fontSize:24,
+          color:CL.primary[900], marginBottom:4
+        }}>Welcome back 👋</h2>
+        <p style={{color:G[500],fontSize:13,marginBottom:22,lineHeight:1.5}}>
+          Sign in to your AgroSense dashboard
+        </p>
+
+        <form onSubmit={submit}>
+          {/* Username */}
+          <div style={{marginBottom:14}}>
+            <FL>{t("username",lang)}</FL>
+            <div style={{position:"relative"}}>
+              <TInp type="text" placeholder={t("username",lang)}
+                value={form.username} onChange={set("username")}
+                autoComplete="username"/>
+              {form.username.length>0&&(
+                <span style={{position:"absolute",right:12,top:"50%",
+                  transform:"translateY(-50%)",fontSize:15}}>
+                  {form.username.length>2?"✅":"✍️"}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* DOB */}
+          <div style={{marginBottom:14}}>
+            <FL>{t("dob",lang)}</FL>
+            <TInp type="date" value={form.dob} onChange={set("dob")}
+              max={new Date().toISOString().split("T")[0]}/>
+          </div>
+
+          {/* Password */}
+          <div style={{marginBottom:20}}>
+            <FL>{t("password",lang)}</FL>
+            <div style={{position:"relative"}}>
+              <TInp type={showPw?"text":"password"}
+                placeholder="••••••••"
+                style={{paddingRight:86,
+                  letterSpacing:showPw?"normal":".18em"}}
+                value={form.password} onChange={set("password")}
+                autoComplete="current-password"/>
+              <div style={{position:"absolute",right:8,top:"50%",
+                transform:"translateY(-50%)",
+                display:"flex",alignItems:"center",gap:4}}>
+                {form.password.length>0&&(
+                  <span style={{fontSize:14}}>
+                    {form.password.length>=4?"✅":"⚠️"}
+                  </span>
+                )}
+                <button type="button" onClick={()=>setSP(p=>!p)} style={{
+                  background:"none",border:"none",
+                  cursor:"pointer",color:G[400],padding:4}}>
+                  {showPw?<EyeOff size={17}/>:<Eye size={17}/>}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {err&&(
+            <div style={{
+              background:"#fef2f2",border:"1px solid #fca5a5",
+              borderRadius:RA.md,padding:"10px 13px",
+              color:"#b91c1c",fontSize:13,marginBottom:14,fontWeight:500
+            }}>⚠️ {err}</div>
+          )}
+
+          <PBtn disabled={busy} shimmer={!busy} style={{borderRadius:RA.lg}}>
+            {busy?t("signingIn",lang):t("signIn",lang)+" →"}
+          </PBtn>
+        </form>
+
+        <p style={{textAlign:"center",fontSize:11,color:G[400],marginTop:14}}>
+          {t("storedDevice",lang)}
+        </p>
       </div>
     </div>
   );
@@ -823,17 +828,7 @@ function DiseaseScreen({lang,setLang}){
     if(!imgF)return;setMode("loading");
     try{
       const fd=new FormData();fd.append("file",imgF);
-      const r=await fetch(API+"/disease-detect",{
-        method:"POST",
-        body:fd,
-        headers:{"Accept":"application/json"},
-      });
-      const ct=r.headers.get("content-type")||"";
-      if(!ct.includes("application/json")){
-        const txt=await r.text();
-        console.error("Non-JSON response:",r.status,txt.substring(0,200));
-        throw new Error("Backend returned HTML instead of JSON. Make sure Flask backend is running on port 5000.");
-      }
+      const r=await fetch(API+"/disease-detect",{method:"POST",body:fd});
       const d=await r.json();
       if(!r.ok)throw new Error(d.error||"API error");
       setRes(d);setMode("result");
@@ -967,9 +962,7 @@ function DiseaseScreen({lang,setLang}){
 
             {/* Result banner */}
             <div style={{
-              background:result.rejected
-                ?"linear-gradient(135deg,#374151,#6b7280)"
-                :result.healthy
+              background:result.healthy
                 ?"linear-gradient(135deg,#14532d,#16a34a)"
                 :GR.disease,
               borderRadius:RA.xl,
@@ -978,9 +971,9 @@ function DiseaseScreen({lang,setLang}){
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
                 <span style={{background:"rgba(255,255,255,.2)",borderRadius:RA.full,
                   padding:"3px 12px",fontSize:12,fontWeight:700}}>
-                  {result.rejected?"⚠️":"🌿"} {result.plant}
+                  🌿 {result.plant}
                 </span>
-                <span style={{background:result.rejected?"rgba(255,255,255,.2)":result.healthy?"rgba(255,255,255,.25)":"rgba(220,38,38,.4)",
+                <span style={{background:result.healthy?"rgba(255,255,255,.25)":"rgba(220,38,38,.4)",
                   borderRadius:RA.full,padding:"3px 12px",fontSize:12,fontWeight:700}}>
                   {result.condition}
                 </span>
@@ -989,7 +982,6 @@ function DiseaseScreen({lang,setLang}){
                 margin:"0 0 10px",lineHeight:1.3}}>
                 {result.display}
               </h2>
-              {!result.rejected&&(
               <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
                 <span style={{background:"rgba(255,255,255,.2)",
                   borderRadius:RA.full,padding:"4px 12px",fontSize:13,fontWeight:600}}>
@@ -1001,15 +993,12 @@ function DiseaseScreen({lang,setLang}){
                   {result.severity} {t("severity",lang)}
                 </span>
               </div>
-              )}
-              {!result.rejected&&(
               <div style={{background:"rgba(255,255,255,.2)",
                 borderRadius:RA.full,height:9,overflow:"hidden"}}>
                 <div style={{width:result.confidence+"%",height:"100%",
                   borderRadius:RA.full,background:"rgba(255,255,255,.75)",
                   transition:"width .9s ease"}}/>
               </div>
-              )}
             </div>
 
             {/* Description */}
@@ -1023,7 +1012,6 @@ function DiseaseScreen({lang,setLang}){
               </div>
             )}
             {/* Stats row */}
-            {!result.rejected&&(
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",
               gap:10,marginBottom:12}}>
               <Card pad="12px 14px" mb="0"
@@ -1050,7 +1038,6 @@ function DiseaseScreen({lang,setLang}){
                 </p>
               </Card>
             </div>
-            )}
 
             {result.symptoms?.length>0&&(
               <Accordion title={t("symptoms",lang)} icon="🔍">
@@ -1067,7 +1054,7 @@ function DiseaseScreen({lang,setLang}){
                 <DotList items={result.prevention} color={CL.primary[600]}/>
               </Accordion>
             )}
-            {!result.rejected&&result.top3?.length>0&&(
+            {result.top3?.length>0&&(
               <Accordion title={t("top3",lang)} icon="📊">
                 {result.top3.map((r,i)=>(
                   <div key={i} style={{
@@ -1098,20 +1085,14 @@ function DiseaseScreen({lang,setLang}){
             )}
 
             {/* Actions */}
-            {result.rejected ? (
-              <PBtn onClick={reset} color="#6b7280" style={{marginTop:8}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:8}}>
+              <PBtn onClick={reset} color="#ea580c">
                 <RefreshCw size={14}/>{t("scanAgain",lang)}
               </PBtn>
-            ) : (
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:8}}>
-                <PBtn onClick={reset} color="#ea580c">
-                  <RefreshCw size={14}/>{t("scanAgain",lang)}
-                </PBtn>
-                <PBtn onClick={shareWA} color="#25D366">
-                  <Share2 size={14}/> WhatsApp
-                </PBtn>
-              </div>
-            )}
+              <PBtn onClick={shareWA} color="#25D366">
+                <Share2 size={14}/> WhatsApp
+              </PBtn>
+            </div>
             <div style={{marginTop:10}}>
               <PBtn onClick={()=>fileRef.current.click()} color="#ea580c" outline
                 style={{background:"rgba(255,255,255,.95)"}}>
@@ -1153,16 +1134,11 @@ function CropScreen({lang,setLang}){
     setSt("loading");
     try{
       const res=await fetch(API+"/crop-recommend",{
-        method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
+        method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({N:+form.N,P:+form.P,K:+form.K,
           temperature:+form.temperature,humidity:+form.humidity,
           ph:+form.ph,rainfall:+form.rainfall})
       });
-      const ct=res.headers.get("content-type")||"";
-      if(!ct.includes("application/json")){
-        console.error("Non-JSON from /crop-recommend:",res.status,await res.text().then(t=>t.substring(0,200)));
-        throw new Error("Backend returned HTML instead of JSON. Make sure Flask backend is running on port 5000.");
-      }
       const d=await res.json();
       if(!res.ok)throw new Error(d.error||"API error");
       setRes(d);setSt("ok");
@@ -1472,16 +1448,11 @@ function PriceScreen({lang,setLang}){
     setSt("loading");
     try{
       const res=await fetch(API+"/price-predict",{
-        method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
+        method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({commodity:form.commodity,
           minPrice:+form.minPrice,maxPrice:+form.maxPrice,
           year:+form.year,month:+form.month,day:+form.day})
       });
-      const ct=res.headers.get("content-type")||"";
-      if(!ct.includes("application/json")){
-        console.error("Non-JSON from /price-predict:",res.status,await res.text().then(t=>t.substring(0,200)));
-        throw new Error("Backend returned HTML instead of JSON. Make sure Flask backend is running on port 5000.");
-      }
       const d=await res.json();
       if(!res.ok)throw new Error(d.error||"API error");
       setRes(d);setSt("ok");
