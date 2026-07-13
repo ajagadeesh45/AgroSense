@@ -42,8 +42,8 @@ def download_models():
                 try:
                     import gdown
                     print(f"  [↓] Downloading {filename}...")
-                    url = f"https://drive.google.com/uc?id={file_id}"
-                    gdown.download(url, path, quiet=False)
+                    url = f"https://drive.google.com/uc?id={file_id}&export=download"
+                    gdown.download(url, path, quiet=False, fuzzy=True)
                     if os.path.exists(path):
                         size = os.path.getsize(path) // 1024
                         print(f"  [OK] {filename} downloaded ({size} KB)")
