@@ -4,6 +4,6 @@ scikit-learn==1.6.1
 numpy==1.26.4
 pandas==2.2.2
 pillow==10.4.0
-tensorflow-cpu==2.16.1
+tensorflow-cpu==2.15.0
 gdown==4.7.3
 gunicorn==21.2.0
