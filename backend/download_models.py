@@ -17,9 +17,9 @@ import sys
 # ── Paste your Google Drive file IDs here ──────────────────────
 MODEL_IDS = {
     "leaf_disease_model.h5":         "1_9xodp-s36B4KPaj7UkxMSUGSo7ULCPX",
-    "Crop_recommendation_model.pkl": "1M8D3daaj-WyNoQFvfhJBgsl8y53N9oEw",
-    "price_model.pkl":               "1Wjzoqt0Dm5ZudrAXlKsPFfgzz_xMlLGo",
-    "label_encoder.pkl":             "1negnvCmJ3gK6psJPPNu-6Ag0KBSNIgmu",
+    "Crop_recommendation_model.pkl": "1yWEHS5gRGoPxP_S1GoPINRe3aZdlRTlq",
+    "price_model.pkl":               "1yUWN3pWB1RD70Q60rrGDnpPBx4IFykJf",
+    "label_encoder.pkl":             "1MoZNcuHfbHYzB48r6g_Ud6kXclA26yJc",
 }
 
 HERE = os.path.dirname(os.path.abspath(__file__))
