@@ -45,12 +45,13 @@ print("  [OK] label_encoder.pkl")
 
 import tensorflow as tf
 tf.get_logger().setLevel("ERROR")
-# Use legacy loader for .h5 models saved with TF 2.13
-try:
-    disease_model = tf.keras.models.load_model(find("leaf_disease_model.h5"), compile=False)
-except Exception:
-    # Fallback for older saved models
-    disease_model = tf.keras.saving.legacy.load_model_from_hdf5(find("leaf_disease_model.h5"))
+
+# Load model saved with TF 2.13
+disease_model = tf.keras.models.load_model(
+    find("leaf_disease_model.h5"),
+    compile=False,
+    custom_objects=None
+)
 _ = disease_model(np.zeros((1,128,128,3), dtype=np.float32), training=False)
 print("  [OK] leaf_disease_model.h5")
 print("All models loaded.\n")
