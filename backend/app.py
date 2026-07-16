@@ -46,14 +46,13 @@ print("  [OK] label_encoder.pkl")
 import tensorflow as tf
 tf.get_logger().setLevel("ERROR")
 
-# Load model saved with TF 2.13
+# Load new .keras format model (re-saved from original .h5)
 disease_model = tf.keras.models.load_model(
-    find("leaf_disease_model.h5"),
-    compile=False,
-    custom_objects=None
+    find("leaf_disease_model_v2.keras"),
+    compile=False
 )
 _ = disease_model(np.zeros((1,128,128,3), dtype=np.float32), training=False)
-print("  [OK] leaf_disease_model.h5")
+print("  [OK] leaf_disease_model_v2.keras")
 print("All models loaded.\n")
 
 DISEASE_CLASSES = [
